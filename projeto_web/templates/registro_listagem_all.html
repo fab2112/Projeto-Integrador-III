@@ -1,0 +1,49 @@
+<!-- template/registro_listagem.html -->
+{% extends 'base.html' %}
+{% block title %}Notícias{% endblock title %}
+{% block content %}
+<br />
+
+<div class="jumbotron"  style="background-color:#31572c;color:white;" align="center" >
+    <h2>
+    <p  style="position: relative; margin-top: -20px;">Banco de Registros</p>
+    </h2>
+</div>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead style="background-color:#bcbd8b;color:black; width:100%">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Nome Científico</th>
+            <th scope="col">Espécie</th>
+            <th scope="col">Bairro</th>
+            <th scope="col">Local</th>
+        </tr>
+        </thead>
+        <tbody style="background-color:#bcbd8b;color:black; width:100%">
+        {% for registro in object_list %}
+        <tr style='cursor: pointer; cursor: hand;' onclick="window.location='{% url 'registro_detail' registro.pk %}';">
+            <td>{{registro.nome_popular}}</td>
+            <td>{{registro.nome_cientifico}}</td>
+            <td>{{registro.especie}}</td>
+            <td>{{registro.bairro}}</td>
+            <td>{{registro.local}}</td>
+        </tr>
+        {% endfor %}
+
+        </tbody>
+        <script>
+            var tables = document.getElementsByTagName('tbody');
+            var table = tables[tables.length - 1];
+            var rows = table.rows;
+            for(var i = 0, td; i < rows.length; i++){
+                td = document.createElement('td');
+                td.appendChild(document.createTextNode(i + 1));
+                rows[i].insertBefore(td, rows[i].firstChild);
+                }
+        </script>
+    </table>
+</div>
+
+{% endblock content %}

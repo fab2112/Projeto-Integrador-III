@@ -1,0 +1,54 @@
+<!-- templates/registration/login.html -->
+{% extends 'base.html' %}
+{% block title %}Log In{% endblock title %}
+{% block content %}
+
+<!--<div class="card border-info text-center">
+  <div class="card-header">
+      {% load socialaccount %}
+      {% load static %}
+      Entrar no Site &nbsp;&nbsp;
+      <a href="{% provider_login_url 'google' %}" type="button" class="btn btn-outline-dark" >
+          <img src="{% static 'imagens/Google_img.png' %}" width="25"/>&nbsp; Login Google</a>
+  </div>
+    <div class="card-body">
+        <p class="card-text">
+        <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-success ml- " type="submit">Entrar</button>
+        </form>
+  </div>
+</div>-->
+
+<form method="post"> {% csrf_token %}
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                <div class="card shadow-2-strong" style="border-radius: 0.5rem;">
+                    <div class="card-body p-5 text-center">
+                        <h3 class="mb-5">Login</h3>
+
+                        <div class="form-outline mb-4" >
+                            <input type="text" id="username" name="username" class="form-control form-control-lg" />
+                            <label class="form-label" for="username">Nome Usuário</label>
+                        </div>
+
+                        <div class="form-outline mb-4">
+                            <input type="password" id="password" name="password" class="form-control form-control-lg" />
+                            <label class="form-label" for="password">Senha</label>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
+                        <hr class="my-4">
+                        <a href="{% provider_login_url 'google' %}" type="button"
+                           class="btn btn-lg btn-block btn-primary" style="color:#404040; background-color: white" >
+                            <img src="{% static 'imagens/Google_img.png' %}" width="25"/> &nbsp; Login Google</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock content %}

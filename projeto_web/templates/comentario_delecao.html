@@ -1,0 +1,41 @@
+<!-- templates/comentario_delecao.html -->
+{% extends 'base.html' %}
+{% block content %}
+
+<br />
+
+
+<!--<div class="card border-info text-center">
+    <div class="card-header">
+        Deletar menssagem
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+        <form action="" method="post">{% csrf_token %}
+            <p>Tem certeza que deseja deletar "{{ comentario.comentario }}"?</p>
+            <button class="btn btn-danger ml- " type="submit">Confirmar</button>
+        </form>
+    </div>
+</div>-->
+
+<form action="" method="post"> {% csrf_token %}
+    <div class="container py-5 h-500">
+        <div class="row d-flex justify-content-center align-items-center h-300">
+            <div class="">
+                <div class="card shadow-2-strong" style="border-radius: 0.5rem;">
+                    <div class="card-body p-5 text-center">
+                        <h5 class="mb-5">Tem certeza que deseja deletar a menssagem?</h5>
+
+                        <div class="form-outline mb-4">
+                            <h5>"{{ comentario.comentario }}"</h5>
+                        </div>
+                        <br />
+                        <button class="btn btn-danger btn-lg btn-block" type="submit">Apagar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock content %}

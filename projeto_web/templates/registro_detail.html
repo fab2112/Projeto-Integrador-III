@@ -1,0 +1,84 @@
+<!-- templates/registro_detail.html -->
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load qr_code %}
+
+<div class="card">
+  <img src="{{ registro.image.url}}" class="card-img-top"  alt="...">
+
+  <div class="card-body" style="background-color:#e0e2db;">
+    <h2 class="card-title" align="center" ><br />{{registro.nome_popular}}</h2>
+    <p class="card-text" align="left" style="font-size:20px">{{registro.desc}}</p><br />
+    <h3 class="card-text" align="center">Ficha Técnica</h3>
+  </div>
+  <ul class="list-group list-group-flush" style="font-size:20px">
+    <li class="list-group-item" style="background-color:#e0e2db;">Nome Científico: {{registro.nome_cientifico}} </li>
+    <li class="list-group-item" style="background-color:#e0e2db;">Espécie: {{registro.especie}}</li>
+    <li class="list-group-item" style="background-color:#e0e2db;">Altura Máxima: {{registro.altura_max}} m</li>
+    <li class="list-group-item" style="background-color:#e0e2db;">Diâmetro Nominal: {{registro.diametro}} cm</li>
+    <li class="list-group-item" style="background-color:#e0e2db;">Clima Típico: {{registro.clima}} </li>
+    <li class="list-group-item" style="background-color:#e0e2db;">Região Natural: {{registro.regiao}} </li>
+    <li class="list-group-item" style="background-color:#e0e2db;">Origem: {{registro.origem}} </li>
+    <li class="list-group-item" style="background-color:#e0e2db;">Extinção: {{registro.extincao}} </li>
+    <li class="list-group-item" style="background-color:#e0e2db;">Bairro: {{registro.bairro}} </li>
+    <li class="list-group-item" style="background-color:#e0e2db;">Local: {{registro.local}} </li>
+    <li class="list-group-item" style="background-color:#e0e2db;">Latitude: {{registro.latitude}} </li>
+    <li class="list-group-item" style="background-color:#e0e2db;">Longitude: {{registro.longitude}} </li>
+    <li class="list-group-item" style="background-color:#e0e2db;">Data de Registro: {{registro.data_1}} </li>
+    <li class="list-group-item" style="background-color:#e0e2db;" ><br /><br />
+      <p align="center">Localização no Mapa</p>
+
+        <div id="googleMap" style="width:100%;height:500px;"></div>
+        <script>
+          function myMap() {
+          var myLatLng = {lat: {{registro.latitude}}, lng: {{registro.longitude}}};
+          var mapProp= {center:new google.maps.LatLng(myLatLng), zoom:12,};
+          var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+          var marker = new google.maps.Marker({ position: myLatLng, map: map});
+          marker.info = new google.maps.InfoWindow({content: "{{registro.nome_popular.upper}}"});
+
+          google.maps.event.addListener(marker, 'click', function() {var marker_map = this.getMap();
+          map.setZoom(17);
+          this.info.open(marker_map, this);});
+          }
+        </script>
+        <!--<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&callback=myMap"></script>-->
+        <script src="https://maps.googleapis.com/maps/api/js?sensor=false&callback=myMap"></script><br />
+
+    </li>
+
+    <li class="list-group-item" style="background-color:#e0e2db;"><br />
+      <p align="center" >{% qr_from_text request.build_absolute_uri size="20" version=5 %} </p>
+      <p align="center" > Todas árvores registradas possuem um QR code para acesso a ficha de informativa </p><br />
+      <font size="3">
+        {% if request.user.is_superuser %}
+          <a href="{% url 'registro_edit' registro.pk %}">Editar</a> |
+          <a href="{% url 'registro_delete' registro.pk %}">Deletar</a> |
+          <a href="{% url 'registro_comment' registro.pk %}">Menssagen</a>
+        {% else %}
+          <div style="text-align: center">
+              <a href="{% url 'registro_comment' registro.pk %}"><h5>Canal de participação do usuário</h5></a>
+          </div>
+        {% endif %}
+      </font>
+    </li>
+  </ul>
+
+  <div class="card-body" style="background-color:#e0e2db;">
+    {% for comentario in registro.comentarios.all %}
+      {% if user.is_authenticated %}
+        <p>{{ comentario }} &nbsp;
+          <span class="text-muted">{{ comentario.autor|lower|capfirst }} &nbsp; {{ comentario.data_2 }} &nbsp;&nbsp;</span>
+          {% if request.user.is_superuser %}
+          <a href="{% url 'comment_delete' comentario.pk %}">Deletar</a>
+          {% endif %}
+      {% endif %}
+    </p>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock content %}
+

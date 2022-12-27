@@ -1,0 +1,66 @@
+# docker-compose.yml
+version: '3.9'
+
+services:
+
+  db:
+    container_name: postgredb
+    image: postgres   
+    volumes:
+      - ./data/db:/var/lib/postgresql/data     
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  pgadmin4:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "projetointegrador"
+    ports:
+      - "85:80"
+    depends_on:
+      - db
+
+  web:
+    container_name: appweb
+    build: .
+    image: appweb
+    command: sh -c "cd projeto_web/ && gunicorn projeto_web.wsgi:application --bind 0.0.0.0:8001"
+    volumes:
+      - .:/projeto
+    expose:
+      - 8001
+    depends_on:
+      - db
+
+  nginx:
+    container_name: nginxserver
+    build: ./nginx
+    image: nginxserver
+    volumes:
+      - .:/projeto
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+
+  dashboard:
+    container_name: dashserver
+    build: ./dashboard
+    image: dashboard
+    restart: always
+    volumes:
+      - .:/projeto
+    ports:
+      - "8050:8050"
+    depends_on:
+      - web
+      
+      
+      
+
+

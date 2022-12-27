@@ -1,0 +1,200 @@
+
+/* change bg-color - all page */
+body {
+  background-color: #eee4e1;
+  }
+
+/* Cards variables */
+:root {
+  --card-margin: 10px !important;
+  --border-radius: 2px !important;
+  --card-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  /*--card-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px !important;*/
+  --graph-margin: 10px !important;
+}
+
+/* Navbar */
+.navbar,
+.navbar-expand-lg,
+.navbar-light,
+.bg-primary {
+  margin-top: 0px;
+  margin-left: -12px;
+  margin-right: -12px;
+  margin-bottom: 15px;
+  padding: 20px !important;
+}
+
+#logo-1 {
+  height: 70px !important;
+  left: 0px;
+  top: 0px;
+}
+
+#title-main {
+  font-weight: bold;
+  text-align: center !important;
+  font-size: 35px !important;
+  padding: 20px !important;
+  text-decoration: underline !important;
+  margin: 2px;
+  padding-bottom: 30px !important;
+  color: #31572c !important;
+}
+
+#title-1 {
+  position: relative;
+  display: inline !important;
+  right: -20px;
+  font-size: 30px !important;
+  font-family: Lato !important;
+  color: white !important;
+  font-weight: 1000 !important;
+  text-align: left !important;
+}
+
+#subtitle-1 {
+  position: relative;
+  display: inline !important;
+  left: 0px;
+  top: 20px;
+  left: -340px;
+  font-size: 16px !important;
+  font-family: Lato !important;
+  color: white !important;
+  font-weight: 500 !important;
+  text-align: left !important;
+}
+
+/* Cards */
+.card,
+.dbc,
+.card-text {
+  background-color: #eee4e1 !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--card-shadow) !important;
+  margin: var(--card-margin) !important;
+}
+
+/* Cards title */
+.card-title {
+  text-align: center !important;
+  margin-top: 15px !important;
+  margin-left: 10px !important;
+  margin-right: 10px !important;
+  margin-bottom: -10px !important;
+  font-size: 18px !important;
+}
+
+/* Cards interactive texts */
+.card-text {
+  padding: 15px !important;
+}
+
+#card-text-1-1,
+#card-text-1-3,
+#card-text-2-1,
+#card-text-2-3,
+#card-text-3-1,
+#card-text-3-3,
+#card-text-4-1,
+#card-text-4-3 {
+  text-align: center !important;
+  font-size: 17px !important;
+}
+
+#card-text-1-2 {
+  text-align: center !important;
+  font-weight: 1000 !important;
+  color: #3cb371 !important;
+}
+
+#card-text-2-2 {
+  text-align: center !important;
+  font-weight: 1000 !important;
+  color: #327c9e !important;
+}
+
+#card-text-3-2 {
+  text-align: center !important;
+  font-weight: 1000 !important;
+  color: #327c9e  !important;
+}
+
+#card-text-4-2 {
+  text-align: center !important;
+  font-weight: 1000 !important;
+  color: #dc143c !important;
+}
+
+/* Dropdowns */
+.dbc {
+  border-radius: var(--border-radius) !important;
+  text-align: left !important;
+  font-size: 17px !important;
+  padding: 15px !important;
+}
+
+#dropdown-1,
+#dropdown-2,
+#dropdown-3 {
+  text-align: left !important;
+  font-size: 17px !important;
+}
+
+#dropdown-3 {
+  width: 30% !important;
+}
+
+/* Card Plots */
+#chart-1-px,
+#chart-2-px,
+#chart-3-px,
+#chart-4-px,
+#chart-5-px,
+#chart-6-px,
+#chart-7-px,
+#chart-8-px,
+#chart-9-px,
+#chart-10-px,
+#chart-11-px,
+#chart-12-px,
+#chart-13-px,
+#chart-14-px,
+#chart-15-px,
+#chart-16-px,
+#chart-17-px {
+  margin: var(--graph-margin) !important;
+  border-radius: var(--border-radius) !important;
+}
+
+.card-plots {
+  background-color: var(--card-bgcolor) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--card-shadow) !important;
+  margin: var(--card-margin) !important;
+}
+
+/* Tabs */
+#tabs {
+  border-radius: var(--border-radius) !important;
+  margin: var(--card-margin) !important;
+  font-size: 17px !important;
+}
+
+/* modebar */
+.js-plotly-plot .plotly .modebar-group {
+  top: -10px;
+  right: 0px;
+  /*background-color: black !important;*/
+}
+
+.modebar-btn {
+  font-size: 12px !important;
+}
+
+/* mapbox-logo */
+.mapboxgl-ctrl-logo {
+  display: none !important;
+}

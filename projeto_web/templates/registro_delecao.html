@@ -1,0 +1,36 @@
+<!-- templates/registro_delecao.html -->
+{% extends 'base.html' %}
+{% block content %}
+
+<br />
+<!--<div class="card border-info text-center">
+    <div class="card-header">
+        Remover item registrado
+    </div>
+    <div class="card-body">
+        <p class="card-text">
+        <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+            <p>Tem certeza que deseja deletar esse item: "{{ registro.nome_popular }}"?</p>
+            <button class="btn btn-danger ml- " type="submit">Confirmar</button>
+        </form>
+    </div>
+</div>-->
+
+<form action="" method="post" enctype="multipart/form-data"> {% csrf_token %}
+    <div class="container py-5 h-500">
+        <div class="row d-flex justify-content-center align-items-center h-300">
+            <div class="col-20 col-md-8 col-lg-6 col-xl-5">
+                <div class="card shadow-2-strong" style="border-radius: 1rem;">
+                    <div class="card-body p-5 text-center">
+                        <h5 class="mb-5">Remover item registrado</h5>
+                        <p>Tem certeza que deseja deletar esse item? "{{ registro.nome_popular }}"</p>
+                        <br />
+                        <button class="btn btn-danger btn-lg btn-block" type="submit">Confirmar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock content %}

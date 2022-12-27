@@ -1,0 +1,494 @@
+# Imports
+import dash
+from dash import dcc, html, Input, Output
+import pandas as pd
+import plotly.express as px
+import dash_bootstrap_components as dbc
+from dash_bootstrap_templates import template_from_url, ThemeChangerAIO
+import warnings
+from flask import Flask
+from waitress import serve
+from sqlalchemy import create_engine
+
+warnings.filterwarnings("ignore")
+
+user = 'postgres'
+passw = 'postgres'
+host = 'postgredb' # '172.18.0.5'
+port = '5432'
+database = 'postgres'
+str_db = 'postgresql+psycopg2://' + user + ':' + passw + '@' + host + ':' + port + '/' + database
+conn = create_engine(str_db)
+# Carrega Tabela criada pelo django
+df = pd.read_sql_query('SELECT * FROM "Registros_registro"', conn)
+
+#df = pd.read_csv('Registros_registro_.csv') # Test
+df = df[['nome_popular', 'altura_max', 'diametro', 'bairro', 'local', 'clima', 'regiao', 'origem', 'latitude',
+         'longitude', 'extincao']]
+
+server = Flask(__name__)
+
+# Parâmetros padrões
+gutter_row = 'g-0'
+fig_margin = dict(l=20, r=20, t=20, b=20)
+gridwidth = 1.5
+grid_color = '#DCDCDC'
+axesx_line_color = 'black'
+axesy_line_color = 'black'
+config_g = {'displaylogo': False,
+            'modeBarButtonsToRemove': [
+                # "zoom2d",
+                # "pan2d",
+                "select2d",
+                "lasso2d",
+                # "zoomIn2d",
+                # "zoomOut2d",
+                "autoScale2d",
+                # "resetScale2d",
+                "hoverClosestCartesian",
+                "hoverCompareCartesian",
+                "zoom3d",
+                "pan3d",
+                "resetCameraDefault3d",
+                "resetCameraLastSave3d",
+                "hoverClosest3d",
+                "orbitRotation",
+                "tableRotation",
+                "zoomInGeo",
+                "zoomOutGeo",
+                "resetGeo",
+                "hoverClosestGeo",
+                # "toImage",
+                "sendDataToCloud",
+                "hoverClosestGl2d",
+                "hoverClosestPie",
+                "toggleHover",
+                "resetViews",
+                "toggleSpikelines",
+                "resetViewMapbox",
+                'drawline',
+                'drawopenpath',
+                'drawclosedpath',
+                'drawcircle',
+                'drawrect',
+                'eraseshape',
+                'hovercompare',
+                'hoverCompareCartesian',
+                'toggleSpikelines',
+                'v1hovermode',
+                'hoverclosest',
+                'togglehover'
+            ],
+            'displayModeBar': 'hover',
+            'locale': 'pt-br', }
+
+mode_bar = {'orientation': 'h',
+            'bgcolor': 'rgba(0,0,0,0)',
+            'color': '#D3D3D3',
+            'activecolor': 'grey',
+            }
+themes_options = [
+    {"label": "Light", "value": dbc.themes.FLATLY},
+    {"label": "Dark", "value": dbc.themes.SLATE},
+]
+
+ThemeChangerAIO(aio_id="theme",
+                radio_props={"value": dbc.themes.FLATLY},
+                button_props={'children': 'Temas', 'style': {'border': '1px solid grey',
+                                                             'border-radios': '2px'}},
+                offcanvas_props={'title': 'Escolha um tema'})
+
+dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
+app = dash.Dash(__name__,
+                external_stylesheets=['projeto.css',
+                                      dbc.themes.FLATLY, dbc_css],
+                server=server,
+                url_base_pathname='/',
+                external_scripts=[{"external_url": "https://cdn.plot.ly/plotly-locale-pt-br.js"}])
+
+
+# ---------- Charts ---------- #
+@app.callback(Output('chart-1-px', 'figure'),
+              [Input('dropdown-2', 'value'),
+               Input('interval-component', 'n_intervals')])
+def chart_1_px(val, n):
+    
+    #df = pd.read_csv('Registros_registro_.csv')
+    df = pd.read_sql_query('SELECT * FROM "Registros_registro"', conn)  
+    df = df[['nome_popular', 'altura_max', 'diametro', 'bairro', 'local', 'clima', 'regiao',
+             'origem', 'latitude', 'longitude', 'extincao']]
+
+    df2 = df[df.bairro == val]
+    df2 = df2.groupby(['nome_popular']).size().reset_index(name='Contagem')
+
+    fig = px.histogram(df2,
+                       x='nome_popular',
+                       y='Contagem',
+                       template=template_from_url(dbc.themes.FLATLY),)
+
+    fig.update_layout(
+        autosize=True,
+        margin=fig_margin,
+        height=230,
+        width=None,
+        xaxis_title=None,
+        paper_bgcolor='#eee4e1',
+        plot_bgcolor='#eee4e1',
+        yaxis_title='Contagem',
+        legend_title='Cidades',
+        clickmode='event+select',
+        modebar=mode_bar,
+        xaxis={'categoryorder': 'total ascending'},
+        hovermode="closest",
+    )
+
+    fig.update_yaxes(showgrid=True, gridwidth=gridwidth, gridcolor=grid_color, linecolor=axesy_line_color)
+    fig.update_xaxes(showgrid=True, gridwidth=gridwidth, gridcolor=grid_color, linecolor=axesx_line_color)
+
+    fig.update_traces(
+        hovertemplate='%{x}<extra></extra> - %{y}', showlegend=False)
+
+    return fig
+
+
+@app.callback(Output('chart-2-px', 'figure'),
+              [Input('interval-component', 'n_intervals')])
+def chart_2_px(n):
+    
+    #df = pd.read_csv('Registros_registro_.csv')
+    df = pd.read_sql_query('SELECT * FROM "Registros_registro"', conn)  
+    df = df[['nome_popular', 'altura_max', 'diametro', 'bairro', 'local', 'clima', 'regiao',
+             'origem', 'latitude', 'longitude', 'extincao']]
+
+    df2 = df.groupby(['nome_popular', 'bairro']
+                     ).size().reset_index(name='Contagem')
+
+    fig = px.bar(df2,
+                 x='bairro',
+                 y='Contagem',
+                 barmode='group',
+                 color='nome_popular',
+                 orientation='v',
+                 custom_data=['nome_popular'],
+                 template=template_from_url(dbc.themes.FLATLY))
+
+    fig.update_layout(
+        autosize=True,
+        margin=fig_margin,
+        height=240,
+        width=None,
+        legend_title='Espécies',
+        paper_bgcolor='#eee4e1',
+        plot_bgcolor='#eee4e1',
+        yaxis_title='Quantidade',
+        xaxis_title=None,
+        clickmode='event+select',
+        modebar=mode_bar,
+    )
+
+    fig.update_yaxes(showgrid=True, gridwidth=gridwidth, gridcolor=grid_color, linecolor=axesy_line_color)
+    fig.update_xaxes(showgrid=True, gridwidth=gridwidth, gridcolor=grid_color, linecolor=axesx_line_color)
+
+    fig.update_traces(
+        hovertemplate=' %{customdata[0]}<extra></extra> <br> %{y} <br> %{x} ')
+
+    return fig
+
+
+@app.callback(Output('chart-3-px', 'figure'),
+              [Input('dropdown-1', 'value'),
+               Input('interval-component', 'n_intervals')])
+def chart_3_px(val, n):
+    
+    #df = pd.read_csv('Registros_registro_.csv')
+    df = pd.read_sql_query('SELECT * FROM "Registros_registro"', conn)  
+    df = df[['nome_popular', 'altura_max', 'diametro', 'bairro', 'local', 'clima', 'regiao',
+             'origem', 'latitude', 'longitude', 'extincao']]
+
+    df2 = df[df.local == val]
+    df2 = df2.groupby(['nome_popular']).size().reset_index(name='Contagem')
+
+    fig = px.pie(df2,
+                 names='nome_popular',
+                 values='Contagem',
+                 hole=0.5, template=template_from_url(dbc.themes.FLATLY))
+
+    fig.update_layout(
+        autosize=True,
+        margin=fig_margin,
+        paper_bgcolor='#eee4e1',
+        plot_bgcolor='#eee4e1',
+        height=230,
+        width=None,
+        legend_title=None,
+        clickmode='event+select',
+        legend=dict(orientation="h", yanchor="bottom", y=-0.4,
+                    xanchor="center", x=0.5, font=dict(size=12)),
+        modebar=mode_bar,
+    )
+
+    fig.update_traces(hovertemplate='%{label} <br> %{value}')
+
+    return fig
+
+
+@app.callback(Output('chart-4-px', 'figure'),
+              [Input('dropdown-2', 'value'),
+               Input('interval-component', 'n_intervals')])
+def chart_4_px(val, n):
+    
+    #df = pd.read_csv('Registros_registro_.csv')
+    df = pd.read_sql_query('SELECT * FROM "Registros_registro"', conn)  
+    df = df[['nome_popular', 'altura_max', 'diametro', 'bairro', 'local', 'clima', 'regiao',
+             'origem', 'latitude', 'longitude', 'extincao']]
+    
+    df2 = df[df.bairro == val]
+    df2 = df2.groupby(['extincao']).size().reset_index(name='Contagem')
+
+    fig = px.histogram(df2,
+                       x='extincao',
+                       y='Contagem',
+                       color='extincao',
+                       template=template_from_url(dbc.themes.FLATLY),)
+
+    fig.update_layout(
+        autosize=True,
+        margin=fig_margin,
+        height=240,
+        width=None,
+        xaxis_title=None,
+        paper_bgcolor='#eee4e1',
+        plot_bgcolor='#eee4e1',
+        yaxis_title='Contagem',
+        legend_title='Cidades',
+        clickmode='event+select',
+        modebar=mode_bar,
+        xaxis={'categoryorder': 'total ascending'},
+        hovermode="closest",
+    )
+
+    fig.update_yaxes(showgrid=True, gridwidth=gridwidth, gridcolor=grid_color, linecolor=axesy_line_color)
+    fig.update_xaxes(showgrid=True, gridwidth=gridwidth, gridcolor=grid_color, linecolor=axesx_line_color)
+
+    fig.update_traces(
+        hovertemplate='%{x}<extra></extra> - %{y}', showlegend=False)
+
+    return fig
+
+
+# ---------- Card Texts ---------- #
+@app.callback([Output('card-text-1-2', 'children'),
+               Output('card-text-1-3', 'children')],
+              [Input('dropdown-2', 'value'),
+              Input('interval-component', 'n_intervals')])
+def card_text_1(bairro, n):
+    
+    #df = pd.read_csv('Registros_registro_.csv')
+    df = pd.read_sql_query('SELECT * FROM "Registros_registro"', conn)  
+    df = df[['nome_popular', 'altura_max', 'diametro', 'bairro', 'local', 'clima', 'regiao',
+             'origem', 'latitude', 'longitude', 'extincao']]
+    
+    df2 = df.groupby(['nome_popular']).size().reset_index(name='Contagem')
+    return [round(sum(df2.Contagem), 2), 'espécies']
+
+
+@app.callback([Output('card-text-2-2', 'children'),
+               Output('card-text-2-3', 'children')],
+              [Input('dropdown-2', 'value'),
+              Input('interval-component', 'n_intervals')])
+def card_text_2(bairro, n):
+    
+    #df = pd.read_csv('Registros_registro_.csv')
+    df = pd.read_sql_query('SELECT * FROM "Registros_registro"', conn)  
+    df = df[['nome_popular', 'altura_max', 'diametro', 'bairro', 'local', 'clima', 'regiao',
+             'origem', 'latitude', 'longitude', 'extincao']]
+    
+    df2 = df.groupby(['nome_popular', 'bairro']
+                     ).size().reset_index(name='Contagem')
+    return [round(sum(df2.Contagem[df2.bairro == bairro]), 2), bairro]
+
+
+@app.callback([Output('card-text-3-2', 'children'),
+               Output('card-text-3-3', 'children')],
+              [Input('dropdown-1', 'value'),
+              Input('interval-component', 'n_intervals')])
+def card_text_3(local, n):
+    
+    #df = pd.read_csv('Registros_registro_.csv')
+    df = pd.read_sql_query('SELECT * FROM "Registros_registro"', conn)  
+    df = df[['nome_popular', 'altura_max', 'diametro', 'bairro', 'local', 'clima', 'regiao',
+             'origem', 'latitude', 'longitude', 'extincao']]
+    
+    df2 = df.groupby(['nome_popular', 'local']
+                     ).size().reset_index(name='Contagem')
+    return [round(sum(df2.Contagem[df2.local == local]), 2), local]
+
+
+@app.callback([Output('card-text-4-2', 'children'),
+               Output('card-text-4-3', 'children')],
+              [Input('dropdown-2', 'value'),
+              Input('interval-component', 'n_intervals')])
+def card_text_4(estado, n):
+    
+    #df = pd.read_csv('Registros_registro_.csv')
+    df = pd.read_sql_query('SELECT * FROM "Registros_registro"', conn)  
+    df = df[['nome_popular', 'altura_max', 'diametro', 'bairro', 'local', 'clima', 'regiao',
+             'origem', 'latitude', 'longitude', 'extincao']]
+    
+    df2 = df.groupby(['nome_popular', 'extincao']
+                     ).size().reset_index(name='Contagem')
+    return [round(sum(df2.Contagem[df2.extincao == 'Em Extinção']), 2), 'Em extinção']
+
+
+# ---------- Card Titles ---------- #
+@app.callback(Output("card-title-1", "children"),
+              Input("dropdown-1", "value"))
+def card_title_1(val):
+    value = f'Espécies catalogadas na {val}'
+    return value
+
+
+@app.callback(Output("card-title-2", "children"),
+              Input("dropdown-2", "value"))
+def card_title_2(val):
+    value = f'Espécies catalogadas no bairro {val}'
+    return value
+
+
+@app.callback(Output('dropdown-1', 'options'),
+              Input('interval-component', 'n_intervals'))
+def dropdown_options_1(n):
+    
+    #df = pd.read_csv('Registros_registro_.csv')
+    df = pd.read_sql_query('SELECT * FROM "Registros_registro"', conn)  
+    df = df[['nome_popular', 'altura_max', 'diametro', 'bairro', 'local', 'clima', 'regiao',
+             'origem', 'latitude', 'longitude', 'extincao']]
+    
+    return df.local.unique()
+
+
+@app.callback(Output('dropdown-2', 'options'),
+              Input('interval-component', 'n_intervals'))
+def dropdown_options_2(n):
+    
+    #df = pd.read_csv('Registros_registro_.csv')
+    df = pd.read_sql_query('SELECT * FROM "Registros_registro"', conn)  
+    df = df[['nome_popular', 'altura_max', 'diametro', 'bairro', 'local', 'clima', 'regiao',
+             'origem', 'latitude', 'longitude', 'extincao']]
+    
+    return df.bairro.unique()
+    
+
+# Dash Layout
+app.layout = dbc.Container([
+
+    html.Div([
+        
+        # Title
+        html.H1('Painel de Análise', id='title-main'),
+
+        # Text cards
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    html.H6("Total de espécies catalogadas",
+                            id="card-text-1-1"),
+                    html.H3(id="card-text-1-2"),
+                    html.H6(id="card-text-1-3"),
+                ], outline=True, class_name='card-text')], md=3),
+
+            dbc.Col([
+                dbc.Card([
+                    html.H6("Total de espécies por bairro",
+                            id="card-text-2-1"),
+                    html.H3(id="card-text-2-2"),
+                    html.H6(id="card-text-2-3"),
+                ], outline=True, class_name='card-text')], md=3),
+
+            dbc.Col([
+                dbc.Card([
+                    html.H6("Total de espécies por localização",
+                            id="card-text-3-1"),
+                    html.H3(id="card-text-3-2"),
+                    html.H6(id="card-text-3-3"),
+                ], outline=True, class_name='card-text')], md=3),
+
+            dbc.Col([
+                dbc.Card([
+                    html.H6("Espécies catalogadas em extinção",
+                            id="card-text-4-1"),
+                    html.H3(id="card-text-4-2"),
+                    html.H6(id="card-text-4-3"),
+                ], outline=True, class_name='card-text')], md=3), ], class_name=gutter_row),
+
+        # Dropdown
+        dbc.Row([
+
+            dbc.Col([
+                dbc.Card(["Selecione um bairro:", dcc.Dropdown(id="dropdown-2",
+                                                               value='Villa Branca',
+                                                               clearable=False,
+                                                               placeholder="Escolha um bairro", ),
+                          ], outline=True, class_name='dbc')], md=6),
+
+            dbc.Col([
+                dbc.Card(["Selecione um local:", dcc.Dropdown(id="dropdown-1",
+                                                              value='Pça dos Esportes',
+                                                              clearable=False,
+                                                              placeholder="Escolha um local"),
+                          ], outline=True, class_name='dbc')], md=6), ], class_name=gutter_row),
+
+        # Graphs
+        dbc.Row([
+
+            dbc.Col(dbc.Card([
+                html.H5(id="card-title-2", className='card-title'),
+                dcc.Loading(dcc.Graph(id='chart-1-px',
+                                      config=config_g), type='default'),
+            ],
+                outline=True, class_name='card'), md=7),
+
+            dbc.Col(dbc.Card([
+                html.H5(id="card-title-1", className='card-title'),
+                dcc.Loading(dcc.Graph(id='chart-3-px',
+                                      config=config_g), type='default'),
+            ],
+                outline=True, class_name='card'), md=5), ], class_name=gutter_row),
+
+
+        dbc.Row([
+
+            dbc.Col(dbc.Card([
+                html.H5('Espécies catalogadas em risco de extinção',
+                    className='card-title'),
+                dcc.Loading(dcc.Graph(id='chart-4-px',
+                                      config=config_g), type='default'),
+            ],
+                outline=True, class_name='card'), md=4),
+
+            dbc.Col(dbc.Card([
+                html.H5('Relação total das espécies por bairro',
+                    className='card-title'),
+                dcc.Loading(dcc.Graph(id='chart-2-px',
+                                      config=config_g), type='default'),
+            ],
+                outline=True, class_name='card'), md=8), ], class_name=gutter_row),
+
+    ], style={'background-color': '#eee4e1','padding-top': '10px'}),
+    
+    dcc.Interval(
+            id='interval-component',
+            interval=100*1000, # in milliseconds
+            n_intervals=0
+        )
+
+], fluid=True, id='container', style={'background-color': '#eee4e1'})
+
+
+# Production deploy
+if __name__ == "__main__":
+    serve(app.server, host='0.0.0.0', port=8050)
+
+# Debug deploy
+"""if __name__ == '__main__':
+    app.run_server(debug=True, dev_tools_hot_reload=True, port=8050)"""

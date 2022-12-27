@@ -1,0 +1,52 @@
+<!-- templates/registro_comentario.html -->
+{% extends 'base.html' %}
+{% block content %}
+
+<br />
+
+<!--<div class="card border-info text-center">
+    {% if request.user.is_superuser %}
+    <div class="card-header" >
+        Enviar menssagem
+    </div>
+    {% else %}
+    <div class="card-header" >
+        Enviar menssagem - Canal de comunicação com adminstradores
+    </div>
+    {% endif %}
+    <div class="card-body">
+        <p class="card-text">
+        <form action="" method="post">{% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-info ml- " type="submit">Comfirmar</button>
+        </form>
+    </div>
+</div>-->
+
+<form action="" method="post"> {% csrf_token %}
+    <div class="container py-5 h-500">
+        <div class="row d-flex justify-content-center align-items-center h-300">
+            <div class="col-20 col-md-8 col-lg-6 col-xl-5">
+                <div class="card shadow-2-strong" style="border-radius: 1rem;">
+                    <div class="card-body p-5 text-center">
+                        {% if request.user.is_superuser %}
+                        <h5 class="mb-5">Enviar menssagem</h5>
+                        {% else %}
+                        <h5 class="mb-5">Canal de comunicação com adminstradores do projeto -
+                            Deixe sua menssagem e ajude a proteger e preservar nosso patrimônio</h5>
+                        {% endif %}
+
+                        <div class="form-outline mb-4" >
+                            <input type="text" id="comentario" name="comentario" class="form-control form-control-lg" />
+                            <label class="form-label" for="comentario">Menssagem - máximo 500 caracteres</label>
+                        </div>
+                        <br />
+                        <button class="btn btn-info btn-lg btn-block" type="submit">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock content %}
